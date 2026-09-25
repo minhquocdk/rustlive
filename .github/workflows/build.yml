@@ -1,0 +1,31 @@
+name: Build Windows
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build release
+        run: cargo build --release --target x86_64-pc-windows-msvc
+
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: gemini-fusion-windows
+          path: target/x86_64-pc-windows-msvc/release/gemini-fusion.exe
+          if-no-files-found: error
